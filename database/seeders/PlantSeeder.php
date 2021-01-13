@@ -14,6 +14,6 @@ class PlantSeeder extends Seeder
      */
     public function run()
     {
-        Plant::factory(10)->create();
+        Plant::factory(5)->create();
     }
 }

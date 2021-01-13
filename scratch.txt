@@ -1,0 +1,15 @@
+ // return Inertia::render('Plant/Index', [
+        //     'filters' => $request->all('search', 'trashed'),
+        //     'plants' => Plant::filter($request->only('search', 'trashed'))
+        //         ->paginate(5)
+                // ->transform(function ($plant) {
+                //     return [
+                //         'id' => $plant->id,
+                //         'name' => $plant->name,
+                //         'description' => $plant->description,
+                //         'price' => $plant->price,
+                //         // 'photo' => $plant->photoUrl(['w' => 40, 'h' => 40, 'fit' => 'crop']),
+                //         'deleted_at' => $plant->deleted_at,
+                //     ];
+                // }),
+        // ]);

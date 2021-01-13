@@ -1,108 +1,140 @@
-<?php
+<?php  
 
 namespace App\Http\Controllers;
 
-use App\Models\Plant;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use App\Models\Plant;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class PlantController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $plant = Plant::get();
-        return inertia('Plant/Index', ["plant" => $plant]);
+        return Inertia::render('Plant/Index', [
+            'plants' => Plant::when($request->term, function ($query, $term) {
+                $query->where('name', 'LIKE', '%'. $term .'%');
+            })
+            ->paginate(5)
+            ->through(function ($plant, $key) {
+                $plant['photo_url']= $plant->photoUrl(['w' => 40, 'h' => 40, 'fit' => 'crop']);
+                return $plant;
+            })
+        ]);
     }
 
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
-    public function create()
+    public function store()
     {
-        //
-    }
+        request()->validate([
+            'name' => 'required|string|unique:plants,name,except,id',
+            'description' => 'required',
+            'price' => 'required|numeric',
+            'photo' => 'required|image|mimes:jpeg,jpg,png,gif',
+        ]);
+
+        Plant::create([
+            'name' => request('name'),
+            'description' => request('description'),
+            'price' => request('price'),
+            'photo' => request()->file('photo')->store('plants'),
+        ]);
+
+        return redirect()->back()->with('message', 'Plant Created!!');
+    }  
 
     /**
-     * Store a newly created resource in storage.
+     * Show the form for creating a new resource.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Plant  $plant
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Plant $plant)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Plant  $plant
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Plant $plant)
-    {
-        return $plant;
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Plant  $plant
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(Request $request, Plant $plant)
+
     {
-        //
+        request()->validate([
+            'name' => 'required|string|unique:plants,name,'.$plant->id,
+            'description' => 'required',
+            'price' => 'required|numeric',
+            'photo' => request()->file('photo') ? 'image|mimes:jpeg,jpg,png,gif' : '',
+        ]);
+        if (request()->file('photo') != null) {
+            Storage::delete($plant->photo);
+            $photo = request()->file('photo')->store('plants');
+        } elseif($plant->photo != null) {  
+            $photo = $plant->photo;
+        } else {
+            $photo = null;
+        }
+        
+        $plant->update([
+            'name' => request('name'),
+            'description' => request('description'),
+            'price' => request('price'),
+            'photo' => $photo ,
+        ]);
+
+        return redirect()->back()->with('message', 'Plant Updated!!');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Show the form for creating a new resource.
      *
-     * @param  \App\Models\Plant  $plant
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy(Plant $plant)
     {
         $plant->delete();
-        return redirect()->back();
+        return back();
     }
 
-    public function permanentDelete($id)
+    public function fetchOnlyTrashed(Request $request)
     {
-        $plant = Plant::onlyTrashed()->where('id',$id);
-        $plant->forceDelete();
-        return redirect()->back();
+        return Inertia::render('Plant/Index', ['trashedMode' => true,'plants' => Plant::onlyTrashed()->when($request->term, function ($query, $term) {
+            $query->where('name', 'LIKE', '%'. $term .'%');
+            })
+            ->paginate(5)
+            ->through(function ($plant, $key) {
+                $plant['photo_url']= $plant->photoUrl(['w' => 40, 'h' => 40, 'fit' => 'crop']);
+                return $plant;
+            }),
+        ]);
+    }
+    public function restoreOnlyTrashed(Request $request)
+    {
+        Plant::onlyTrashed()->find($request->id)->restore();
+        return redirect()->back()->with('message', 'Plant Restored!!');
     }
 
-    public function restore($id)
+    public function deleteOnlyTrashed(Request $request)
     {
-        $plant = Plant::onlyTrashed()->where('id',$id);
-        $plant->restore();
-        return redirect()->back();
+        Storage::delete($request->photo);
+        Plant::onlyTrashed()->find($request->id)->forceDelete();
+        return redirect()->back()->with('message', 'Plant Deleted!!');
     }
 
-    public function trashed()
+    public function restoreAllTrashed()
     {
+        Plant::onlyTrashed()->restore();
+        return redirect()->back()->with('message', 'All Plant Restored!!');
+    }
+
+    public function deleteAllTrashed()
+    {   
         $plant = Plant::onlyTrashed()->get();
-        return inertia("Plant/Trashed",['plant'=>$plant]);
+        foreach ($plant as $data) {
+            Storage::delete($data->photo);
+        }
+        Plant::onlyTrashed()->forceDelete();
+        return redirect()->back()->with('message', 'All Plant Deleted!!');
     }
-    
 }

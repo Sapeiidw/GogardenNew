@@ -3,9 +3,9 @@
 
     <template #header>
 
-        <h2 class="font-semibold text-xl leading-tight">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
 
-            Manage <a href="/plant" class="hover:text-green-500 text-green-800">Plant</a> <span v-show="trashedMode">/ <a href="/plant/trashed" class="hover:text-green-500 text-green-800">Trashed</a></span> 
+            Manage User 
 
         </h2>
 
@@ -31,8 +31,8 @@
 
                 </div>
                 <div class="flex justify-between items-center mb-4">
-                    <button @click="openModal()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-3">Create New Plant</button>
-                    
+                    <button @click="openModal()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-3">Create New User</button>
+
                     <div class="flex relative h-1/2 w-1/2">
                         <span class="h-full absolute inset-y-0 left-0 flex items-center pl-2">
                             <svg viewBox="0 0 24 24" class="h-4 w-4 fill-current text-gray-500">
@@ -45,7 +45,7 @@
                     </div>
 
                     <div class="flex relative h-1/2 text-red-500" v-show="!trashedMode">
-                        <span class="h-full absolute inset-y-0 -left-4 flex items-center">
+                        <span class="h-full absolute inset-y-0 -left-2 flex items-center">
                             <svg class="h-4 w-4 fill-current text-red-800" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 383.411 383.411" style="enable-background:new 0 0 383.411 383.411;" xml:space="preserve">
                                 <path d="M335.588,69.176L257.006,7.262C251.838,3.189,242.635,0,236.056,0H53.063c-8.271,0-15,6.729-15,15v353.411
                     c0,8.271,6.729,15,15,15h277.285c8.271,0,15-6.729,15-15V89.293C345.348,82.209,341.152,73.562,335.588,69.176z M179.039,284.85
@@ -57,7 +57,7 @@
                     C315.392,82.6,314.382,85.441,308.882,85.441z" />
                             </svg>
                         </span>
-                        <inertia-link href='/plant/trashed'>Trashed data</inertia-link>
+                        <inertia-link href='/user/trashed'>Trashed data</inertia-link>
                     </div>
 
                     <div v-show="trashedMode">
@@ -79,9 +79,9 @@
 
                             <th class="px-4 py-2">Name</th>
 
-                            <th class="px-4 py-2">Description</th>
+                            <th class="px-4 py-2">email</th>
 
-                            <th class="px-4 py-2">Price</th>
+                            <th class="px-4 py-2">role</th>
 
                             <th class="px-4 py-2">Action</th>
 
@@ -90,19 +90,21 @@
                     </thead>
 
                     <tbody>
-                        <tr v-for="(row, index) in plants.data" :key="row.id">
+                        <tr v-for="(row, index) in users.data" :key="row.id">
 
-                            <td class="border px-4 py-2">{{ (plants.current_page -1) * plants.per_page + index + 1 }}</td>
+                            <td class="border px-4 py-2">{{ (users.current_page -1) * users.per_page + index + 1 }}</td>
 
                             <td class="border px-4 py-2">
-                                <img :src="row.photo_url" :alt="row.name" class="mx-auto w-32 h-32 rounded-full shadow-md">
+                                <img :src="row.profile_photo_url" :alt="row.name" class="mx-auto w-32 h-32 rounded-full shadow-md">
                             </td>
 
                             <td class="border px-4 py-2">{{ row.name }}</td>
 
-                            <td class="border px-4 py-2">{{ row.description }}</td>
+                            <td class="border px-4 py-2">{{ row.email }}</td>
 
-                            <td class="border px-4 py-2">{{ row.price }}</td>
+                            <td class="border px-4 py-2">
+                                <span class="rounded-full bg-green-100 px-4" v-for="role in row.roles" :key="role.id"> {{ role.title }} </span>
+                            </td>
 
                             <td class="border px-4 py-2" v-show="!trashedMode">
 
@@ -128,30 +130,25 @@
 
                 <div class="px-5 py-5 bg-white border-t flex flex-col xs:flex-row items-center xs:justify-between          ">
                     <span class="text-xs xs:text-sm text-gray-900">
-                        Showing {{ plants.from }} to {{ plants.to }} of {{ plants.total }} Entries
+                        Showing {{ users.from }} to {{ users.to }} of {{ users.total }} Entries
                     </span>
                     <div class="flex justify-between w-full mt-2 xs:mt-0">
-                        <inertia-link as="button" :href="plants.prev_page_url || '' " class="border border-green-500 text-green-500 block rounded-sm font-bold py-4 px-6 mr-2 flex items-center hover:bg-green-500 hover:text-white">
+                        <inertia-link as="button" :href="users.prev_page_url || '' " class="border border-green-500 text-green-500 block rounded-sm font-bold py-4 px-6 mr-2 flex items-center hover:bg-green-500 hover:text-white">
                             <svg class="h-5 w-5 mr-2 fill-current" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="-49 141 512 512" style="enable-background:new -49 141 512 512;" xml:space="preserve">
                                 <path id="XMLID_10_" d="M438,372H36.355l72.822-72.822c9.763-9.763,9.763-25.592,0-35.355c-9.763-9.764-25.593-9.762-35.355,0 l-115.5,115.5C-46.366,384.01-49,390.369-49,397s2.634,12.989,7.322,17.678l115.5,115.5c9.763,9.762,25.593,9.763,35.355,0 c9.763-9.763,9.763-25.592,0-35.355L36.355,422H438c13.808,0,25-11.193,25-25S451.808,372,438,372z"></path>
                             </svg>
                             Previous page
                         </inertia-link>
 
-                        <!-- <inertia-link v-for="link in plants.links" :key="link" as="button" :href="link.url" :active='link.active' class="text-sm bg-green-300 hover:bg-green-400 text-green-900 font-semibold py-2 px-4 rounded-l">
-                            {{ link.label }}
-                        </inertia-link> -->
-
-                        <inertia-link as="button" :href="plants.next_page_url || '' " class="border border-green-500 bg-green-500 text-white block rounded-sm font-bold py-4 px-6 ml-2 flex items-center">
+                        <inertia-link as="button" :href="users.next_page_url || '' " class="border border-green-500 bg-green-500 text-white block rounded-sm font-bold py-4 px-6 ml-2 flex items-center">
                             Next page
-                            <svg class="h-5 w-5 ml-2 fill-current" clasversion="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-                                viewBox="-49 141 512 512" style="enable-background:new -49 141 512 512;" xml:space="preserve">
-                            <path id="XMLID_11_" d="M-24,422h401.645l-72.822,72.822c-9.763,9.763-9.763,25.592,0,35.355c9.763,9.764,25.593,9.762,35.355,0
+                            <svg class="h-5 w-5 ml-2 fill-current" clasversion="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="-49 141 512 512" style="enable-background:new -49 141 512 512;" xml:space="preserve">
+                                <path id="XMLID_11_" d="M-24,422h401.645l-72.822,72.822c-9.763,9.763-9.763,25.592,0,35.355c9.763,9.764,25.593,9.762,35.355,0
                                 l115.5-115.5C460.366,409.989,463,403.63,463,397s-2.634-12.989-7.322-17.678l-115.5-115.5c-9.763-9.762-25.593-9.763-35.355,0
-                                c-9.763,9.763-9.763,25.592,0,35.355l72.822,72.822H-24c-13.808,0-25,11.193-25,25S-37.808,422-24,422z"/>
+                                c-9.763,9.763-9.763,25.592,0,35.355l72.822,72.822H-24c-13.808,0-25,11.193-25,25S-37.808,422-24,422z" />
                             </svg>
                         </inertia-link>
-                       
+
                     </div>
                 </div>
 
@@ -189,31 +186,43 @@
 
                                         <div class="mb-4">
 
-                                            <label for="exampleFormControlInput2" class="block text-gray-700 text-sm font-bold mb-2">description:</label>
+                                            <label for="exampleFormControlInput2" class="block text-gray-700 text-sm font-bold mb-2">email:</label>
 
-                                            <textarea class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="exampleFormControlInput2" v-model="form.description" placeholder="Enter description"></textarea>
+                                            <input type="email" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="exampleFormControlInput1" placeholder="Enter email" v-model="form.email">
 
-                                            <div v-if="$page.props.errors.description" class="text-red-500">{{ $page.props.errors.description }}</div>
-
-                                        </div>
-
-                                        <div class="mb-4">
-
-                                            <label for="exampleFormControlInput1" class="block text-gray-700 text-sm font-bold mb-2">price:</label>
-
-                                            <input type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="exampleFormControlInput1" placeholder="Enter price" v-model="form.price">
-
-                                            <div v-if="$page.props.errors.price" class="text-red-500">{{ $page.props.errors.price }}</div>
+                                            <div v-if="$page.props.errors.email" class="text-red-500">{{ $page.props.errors.email }}</div>
 
                                         </div>
 
                                         <div class="mb-4">
 
-                                            <label for="exampleFormControlInput1" class="block text-gray-700 text-sm font-bold mb-2">price:</label>
+                                            <label for="exampleFormControlInput2" class="block text-gray-700 text-sm font-bold mb-2">password:</label>
+
+                                            <input type="password" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="exampleFormControlInput1" placeholder="Enter password" v-model="form.password">
+
+                                            <div v-if="$page.props.errors.password" class="text-red-500">{{ $page.props.errors.password }}</div>
+
+                                        </div>
+
+                                        <div class="mb-4">
+
+                                            <label for="exampleFormControlInput1" class="block text-gray-700 text-sm font-bold mb-2">role:</label>
+
+                                            <select v-model="form.role" id="role">
+                                                <option v-for="role in roles" :key="role.id" :value="role.id"  :selected="form.role == role.id ? 'selected' : '' "  > {{ role.title  }}</option>
+                                            </select>
+
+                                            <div v-if="$page.props.errors.role" class="text-red-500">{{ $page.props.errors.role }}</div>
+
+                                        </div>
+
+                                        <div class="mb-4">
+
+                                            <label for="exampleFormControlInput1" class="block text-gray-700 text-sm font-bold mb-2">photo:</label>
 
                                             <input type="file" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="exampleFormControlInput1" placeholder="Enter Image" @change="onImageChange">
 
-                                            <div v-if="$page.props.errors.photo" class="text-red-500">{{ $page.props.errors.photo }}</div>
+                                            <div v-if="$page.props.errors.profile_photo_path" class="text-red-500">{{ $page.props.errors.profile_photo_path }}</div>
 
                                         </div>
 
@@ -284,9 +293,9 @@ export default {
 
     },
 
-    // props: ['data', 'errors'],
     props: {
-        plants: Object,
+        users: Object,
+        roles: Array,
         errors: Object,
         trashedMode: Boolean,
     },
@@ -304,11 +313,13 @@ export default {
 
                 name: null,
 
-                description: null,
+                email: null,
 
-                price: null,
+                password: null,
 
-                photo: null,
+                role: null,
+
+                profile_photo_path: null,
 
             },
 
@@ -340,32 +351,35 @@ export default {
 
                 name: null,
 
-                description: null,
+                email: null,
 
-                price: null,
+                password: null,
 
-                photo: null,
+                role: null,
+
+                profile_photo_path: null,
 
             }
         },
 
         save: function (data) {
-
-            this.$inertia.post('/plant', data)
+            data.role = data.role.id
+            this.$inertia.post('/user', data)
 
             this.reset();
 
             this.closeModal();
 
-            this.editMode = false;            
+            this.editMode = false;
 
         },
 
         edit: function (data) {
 
-            this.form = Object.assign({}, data);
-
-            this.form.photo = null;
+            this.form = Object.assign({}, data)
+            this.form.role = this.roles[0].id
+            this.form.password = null
+            this.form.profile_photo_path = null
 
             this.editMode = true;
 
@@ -378,10 +392,11 @@ export default {
             let forms = new FormData()
             forms.append('_method', 'put')
             forms.append('name', data.name)
-            forms.append('description', data.description)
-            forms.append('price', data.price)
-            forms.append('photo', data.photo)
-            this.$inertia.post('/plant/' + data.id, forms)
+            forms.append('email', data.email)
+            forms.append('password', data.password)
+            forms.append('role', data.role)
+            forms.append('profile_photo_path', data.profile_photo_path)
+            this.$inertia.post('/user/' + data.id, forms)
 
             this.errors
 
@@ -403,16 +418,16 @@ export default {
                 confirmButtonColor: '#d33',
                 // cancelButtonColor: '#fff',
                 confirmButtonText: 'Yes, delete it!'
-                }).then((result) => {
+            }).then((result) => {
                 if (result.isConfirmed) {
                     data._method = 'DELETE';
-                    this.$inertia.post('/plant/' + data.id, data)
+                    this.$inertia.post('/user/' + data.id, data)
                     this.reset();
                     this.closeModal();
                     Swal.fire(
-                    'Deleted!',
-                    'Your file has been deleted.',
-                    'success'
+                        'Deleted!',
+                        'Your file has been deleted.',
+                        'success'
                     )
                 }
             })
@@ -420,14 +435,14 @@ export default {
 
         search: _.throttle(function () {
             if (!this.trashedMode) {
-                this.$inertia.get('/plant', {
+                this.$inertia.get('/user', {
                     term: this.term
                 }, {
                     replace: true,
                     preserveScroll: true
                 })
             } else {
-                this.$inertia.get('/plant/trashed', {
+                this.$inertia.get('/user/trashed', {
                     term: this.term
                 }, {
                     replace: true,
@@ -438,7 +453,7 @@ export default {
 
         onImageChange(e) {
             e.preventDefault();
-            this.form.photo = e.target.files[0];
+            this.form.profile_photo_path = e.target.files[0];
         },
 
         restore: function (data) {
@@ -452,19 +467,18 @@ export default {
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
                 confirmButtonText: 'Yes, restore it!'
-                }).then((result) => {
+            }).then((result) => {
                 if (result.isConfirmed) {
                     data._method = 'PUT';
-                    this.$inertia.post('/plant/trashed/' + data.id, data)
+                    this.$inertia.post('/user/trashed/' + data.id, data)
                     Swal.fire(
-                    'Restored!',
-                    'Your file has been restored.',
-                    'success'
+                        'Restored!',
+                        'Your file has been restored.',
+                        'success'
                     )
                 }
             })
 
-            
         },
 
         forceDeleteRow: function (data) {
@@ -477,14 +491,14 @@ export default {
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
                 confirmButtonText: 'Yes,permanent delete it!'
-                }).then((result) => {
+            }).then((result) => {
                 if (result.isConfirmed) {
                     data._method = 'DELETE';
-                    this.$inertia.post('/plant/trashed/' + data.id, data)
+                    this.$inertia.post('/user/trashed/' + data.id, data)
                     Swal.fire(
-                    'Deleted!',
-                    'Your file has been permanently deleted.',
-                    'success'
+                        'Deleted!',
+                        'Your file has been permanently deleted.',
+                        'success'
                     )
                 }
             })
@@ -492,7 +506,7 @@ export default {
 
         restoreAll: function (data) {
             // if (!confirm('Are you sure want to restore all data?')) return;
-            
+
             Swal.fire({
                 title: 'Are you sure?',
                 text: "All data will be restored. You won't be able to revert this!",
@@ -501,13 +515,13 @@ export default {
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
                 confirmButtonText: 'Yes,restore it!'
-                }).then((result) => {
+            }).then((result) => {
                 if (result.isConfirmed) {
-                    this.$inertia.get('/plant/trashed/restore-all')
+                    this.$inertia.get('/user/trashed/restore-all')
                     Swal.fire(
-                    'All data restored!',
-                    'All your file has been restored.',
-                    'success'
+                        'All data restored!',
+                        'All your file has been restored.',
+                        'success'
                     )
                 }
             })
@@ -515,7 +529,7 @@ export default {
 
         deleteAll: function () {
             // if (!confirm('Are you sure want to permanetly delete all data?')) return;
-            
+
             Swal.fire({
                 title: 'Are you sure?',
                 text: "All data will be deleted permanently. You won't be able to revert this!",
@@ -524,13 +538,13 @@ export default {
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
                 confirmButtonText: 'Yes,permanent delete it!'
-                }).then((result) => {
+            }).then((result) => {
                 if (result.isConfirmed) {
-                    this.$inertia.delete('/plant/trashed/delete-all')
+                    this.$inertia.delete('/user/trashed/delete-all')
                     Swal.fire(
-                    'All data deleted!',
-                    'All your file has been permanently deleted.',
-                    'success'
+                        'All data deleted!',
+                        'All your file has been permanently deleted.',
+                        'success'
                     )
                 }
             })

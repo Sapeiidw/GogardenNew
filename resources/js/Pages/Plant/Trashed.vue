@@ -11,7 +11,7 @@
                 <div class="container mx-auto px-4 sm:px-8">
                     <div class="py-8">
                         <div>
-                            <h2 class="text-2xl font-semibold leading-tight">Plants</h2>
+                            <h2 class="text-2xl font-semibold leading-tight">Plant > Trashed </h2>
                         </div>
                         <div class="my-2 flex sm:flex-row flex-col">
                             <div class="flex flex-row mb-1 sm:mb-0">
@@ -24,9 +24,8 @@
                                 </div>
                                 <div class="relative">
                                     <select class="appearance-none h-full rounded-r border-t sm:rounded-r-none sm:border-r-0 border-r border-b block appearance-none w-full bg-white border-gray-400 text-gray-700 py-2 px-4 pr-8 leading-tight focus:outline-none focus:border-l focus:border-r focus:bg-white focus:border-gray-500">
-                                        <option>All</option>
-                                        <option>Active</option>
-                                        <option>Inactive</option>
+                                        <option value="all">All</option>
+                                        <option value="trashed">Trashed</option>
                                     </select>
                                 </div>
                             </div>
@@ -37,7 +36,11 @@
                                         </path>
                                     </svg>
                                 </span>
-                                <input placeholder="Search" class="appearance-none rounded-r rounded-l sm:rounded-l-none border border-gray-400 border-b block pl-8 pr-6 py-2 w-full bg-white text-sm placeholder-gray-400 text-gray-700 focus:bg-white focus:placeholder-gray-600 focus:text-gray-700 focus:outline-none" />
+                                <input type="text" v-model="term" @keyup="search" placeholder="Search" class="appearance-none rounded-r rounded-l sm:rounded-l-none border border-gray-400 border-b block pl-8 pr-6 py-2 w-full bg-white text-sm placeholder-gray-400 text-gray-700 focus:bg-white focus:placeholder-gray-600 focus:text-gray-700 focus:outline-none" />
+                            </div>
+                            <div class="h-full flex flex-row justify-around items-stretch">
+                                <inertia-link href="/plant">Plant</inertia-link>
+                                <inertia-link href="/plant/create">Create New Plant</inertia-link>
                             </div>
                         </div>
                         <div class="-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto">
@@ -51,7 +54,7 @@
                                             <th class="px-5 py-4 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                                 Description
                                             </th>
-                                            <th class="px-5 py-4 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                            <th class="px-5 py-4 borlr-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                                 Created at
                                             </th>
                                             <th class="px-5 py-4 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
@@ -60,7 +63,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr v-for="(item, index) in plant" :key="index" class="hover:bg-green-300 border-b border-gray-200 bg-white">
+                                        <tr v-for="(item, index) in plant.data" :key="index" class="hover:bg-green-300 border-b border-gray-200 bg-white">
                                             <td class="px-5 py-5 text-sm">
                                                 <div class="flex items-center">
                                                     <div class="ml-3">
@@ -77,6 +80,7 @@
                                                 <p class="text-gray-900 whitespace-no-wrap">
                                                     {{ item.created_at }}
                                                 </p>
+                                                <img :src="`/storage/${item.plant_photo_path}`" alt="">
                                             </td>
                                             <td class="px-5 py-5 text-sm">
                                                 <span class="relative inline-flex px-3 py-1 my-1 font-semibold text-purple-900 leading-tight">
@@ -96,12 +100,12 @@
                                         Showing 1 to 4 of 50 Entries
                                     </span>
                                     <div class="inline-flex mt-2 xs:mt-0">
-                                        <button class="text-sm bg-green-300 hover:bg-green-400 text-green-900 font-semibold py-2 px-4 rounded-l">
+                                        <inertia-link as="button" :href="plant.prev_page_url || '' " class="text-sm bg-green-300 hover:bg-green-400 text-green-900 font-semibold py-2 px-4 rounded-l">
                                             Prev
-                                        </button>
-                                        <button class="text-sm bg-green-300 hover:bg-green-400 text-green-900 font-semibold py-2 px-4 rounded-r">
+                                        </inertia-link>
+                                        <inertia-link as="button" :href="plant.next_page_url || '' " class="text-sm bg-green-300 hover:bg-green-400 text-green-900 font-semibold py-2 px-4 rounded-r">
                                             Next
-                                        </button>
+                                        </inertia-link>
                                     </div>
                                 </div>
                             </div>
@@ -116,10 +120,23 @@
 
 <script>
 import AppLayout from '@/Layouts/AppLayout'
+// import _ from 'lodash'
 export default {
     components: {
         AppLayout,
     },
-    props: ['plant']
+    data() {
+        return {
+            term: '',
+        }
+    },
+    props: {
+        plant: Object,
+    },
+    methods: {
+        search: _.throttle(function () {
+            this.$inertia.get('/trashed/plant?term=' + this.term)
+        }, 200),
+    },
 }
 </script>
