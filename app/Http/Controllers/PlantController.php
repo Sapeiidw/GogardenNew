@@ -76,7 +76,7 @@ class PlantController extends Controller
             'name' => 'required|string|unique:plants,name,'.$plant->id,
             'description' => 'required',
             'price' => 'required|numeric',
-            'photo' => request()->file('photo') ? 'image|mimes:jpeg,jpg,png,gif|size:1024' : '',
+            'photo' => request()->file('photo') ? 'image|mimes:jpeg,jpg,png,gif' : '',
         ]);
         if (request()->file('photo')) {
             Storage::delete($plant->photo);
