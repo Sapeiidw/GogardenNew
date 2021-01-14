@@ -17,7 +17,10 @@ class Plant extends Model
     protected $dates = ["deleted_at"];
     protected $guarded = [];
 
-   
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class);
+    }
 
     public function photoUrl()
     {
@@ -37,4 +40,6 @@ class Plant extends Model
     {
         return isset($_ENV['VAPOR_ARTIFACT_NAME']) ? 's3' : 'public';
     }
+
+    
 }

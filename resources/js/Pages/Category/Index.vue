@@ -5,7 +5,7 @@
 
         <h2 class="font-semibold text-xl leading-tight">
 
-            Manage <a href="/plant" class="hover:text-green-500 text-green-800">Plant</a> <span v-show="trashedMode">/ <a href="/plant/trashed" class="hover:text-green-500 text-green-800">Trashed</a></span> 
+            Manage <a href="/category" class="hover:text-green-500 text-green-800">Category</a> <span v-show="trashedMode">/ <a href="/category/trashed" class="hover:text-green-500 text-green-800">Trashed</a></span> 
 
         </h2>
 
@@ -31,7 +31,7 @@
 
                 </div>
                 <div class="flex justify-between items-center mb-4">
-                    <button @click="openModal()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-3">Create New Plant</button>
+                    <button @click="openModal()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-3">Create New Category</button>
                     
                     <div class="flex relative h-1/2 w-1/2">
                         <span class="h-full absolute inset-y-0 left-0 flex items-center pl-2">
@@ -57,7 +57,7 @@
                     C315.392,82.6,314.382,85.441,308.882,85.441z" />
                             </svg>
                         </span>
-                        <inertia-link href='/plant/trashed'>Trashed data</inertia-link>
+                        <inertia-link href='/category/trashed'>Trashed data</inertia-link>
                     </div>
 
                     <div v-show="trashedMode">
@@ -75,15 +75,7 @@
 
                             <th class="px-4 py-2 w-20">No.</th>
 
-                            <th class="px-4 py-2">Photo</th>
-
-                            <th class="px-4 py-2">Name</th>
-
-                            <th class="px-4 py-2">Description</th>
-
-                            <th class="px-4 py-2">Price</th>
-                            
-                            <th class="px-4 py-2">Categories</th>
+                            <th class="px-4 py-2">Title</th>
 
                             <th class="px-4 py-2">Action</th>
 
@@ -92,35 +84,21 @@
                     </thead>
 
                     <tbody>
-                        <tr v-for="(row, index) in plants.data" :key="row.id">
+                        <tr v-for="(row, index) in categories.data" :key="row.id">
 
-                            <td class="border px-4 py-2">{{ (plants.current_page -1) * plants.per_page + index + 1 }}</td>
+                            <td class="border px-4 py-2">{{ (categories.current_page -1) * categories.per_page + index + 1 }}</td>
 
-                            <td class="border px-4 py-2">
-                                <img :src="row.photo_url" :alt="row.name" class="mx-auto w-32 h-32 rounded-full shadow-md">
-                            </td>
+                            <td class="border px-4 py-2">{{ row.title }}</td>
 
-                            <td class="border px-4 py-2">{{ row.name }}</td>
+                            <td class="border px-4 py-2 flex flex-row justify-center items-center" v-show="!trashedMode">
 
-                            <td class="border px-4 py-2">{{ row.description }}</td>
+                                <button @click="edit(row)" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mx-3">Edit</button>
 
-                            <td class="border px-4 py-2">{{ row.price }}</td>
-
-                            <td class="border px-4 py-2">
-                                <div class="flex flex-wrap justify-around">
-                                    <p class="bg-green-800 text-white rounded-full py-1 px-4 text-center font-bold my-1" v-for="category in row.categories" :key="category.id">{{ category.title }}</p>
-                                </div>
-                            </td>
-
-                            <td class="border px-4 py-2" v-show="!trashedMode">
-
-                                <button @click="edit(row)" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Edit</button>
-
-                                <button @click="deleteRow(row)" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Delete</button>
+                                <button @click="deleteRow(row)" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mx-3">Delete</button>
 
                             </td>
 
-                            <td class="border px-4 py-2" v-show="trashedMode">
+                            <td class="border px-4 py-2 flex flex-row justify-center items-center" v-show="trashedMode">
 
                                 <button @click="restore(row)" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Restore</button>
 
@@ -136,21 +114,17 @@
 
                 <div class="px-5 py-5 bg-white border-t flex flex-col xs:flex-row items-center xs:justify-between          ">
                     <span class="text-xs xs:text-sm text-gray-900">
-                        Showing {{ plants.from }} to {{ plants.to }} of {{ plants.total }} Entries
+                        Showing {{ categories.from }} to {{ categories.to }} of {{ categories.total }} Entries
                     </span>
                     <div class="flex justify-between w-full mt-2 xs:mt-0">
-                        <inertia-link as="button" :href="plants.prev_page_url || '' " class="border border-green-500 text-green-500 block rounded-sm font-bold py-4 px-6 mr-2 flex items-center hover:bg-green-500 hover:text-white">
+                        <inertia-link as="button" :href="categories.prev_page_url || '' " class="border border-green-500 text-green-500 block rounded-sm font-bold py-4 px-6 mr-2 flex items-center hover:bg-green-500 hover:text-white">
                             <svg class="h-5 w-5 mr-2 fill-current" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="-49 141 512 512" style="enable-background:new -49 141 512 512;" xml:space="preserve">
                                 <path id="XMLID_10_" d="M438,372H36.355l72.822-72.822c9.763-9.763,9.763-25.592,0-35.355c-9.763-9.764-25.593-9.762-35.355,0 l-115.5,115.5C-46.366,384.01-49,390.369-49,397s2.634,12.989,7.322,17.678l115.5,115.5c9.763,9.762,25.593,9.763,35.355,0 c9.763-9.763,9.763-25.592,0-35.355L36.355,422H438c13.808,0,25-11.193,25-25S451.808,372,438,372z"></path>
                             </svg>
                             Previous page
                         </inertia-link>
 
-                        <!-- <inertia-link v-for="link in plants.links" :key="link" as="button" :href="link.url" :active='link.active' class="text-sm bg-green-300 hover:bg-green-400 text-green-900 font-semibold py-2 px-4 rounded-l">
-                            {{ link.label }}
-                        </inertia-link> -->
-
-                        <inertia-link as="button" :href="plants.next_page_url || '' " class="border border-green-500 bg-green-500 text-white block rounded-sm font-bold py-4 px-6 ml-2 flex items-center">
+                        <inertia-link as="button" :href="categories.next_page_url || '' " class="border border-green-500 bg-green-500 text-white block rounded-sm font-bold py-4 px-6 ml-2 flex items-center">
                             Next page
                             <svg class="h-5 w-5 ml-2 fill-current" clasversion="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
                                 viewBox="-49 141 512 512" style="enable-background:new -49 141 512 512;" xml:space="preserve">
@@ -187,51 +161,13 @@
 
                                         <div class="mb-4">
 
-                                            <label for="exampleFormControlInput1" class="block text-gray-700 text-sm font-bold mb-2">name:</label>
+                                            <label for="exampleFormControlInput1" class="block text-gray-700 text-sm font-bold mb-2">title:</label>
 
-                                            <input type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="exampleFormControlInput1" placeholder="Enter name" v-model="form.name">
+                                            <input type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="exampleFormControlInput1" placeholder="Enter title" v-model="form.title">
 
-                                            <div v-if="$page.props.errors.name" class="text-red-500">{{ $page.props.errors.name }}</div>
+                                            <div v-if="$page.props.errors.title" class="text-red-500">{{ $page.props.errors.title }}</div>
 
-                                        </div>
-
-                                        <div class="mb-4">
-
-                                            <label for="exampleFormControlInput2" class="block text-gray-700 text-sm font-bold mb-2">description:</label>
-
-                                            <textarea class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="exampleFormControlInput2" v-model="form.description" placeholder="Enter description"></textarea>
-
-                                            <div v-if="$page.props.errors.description" class="text-red-500">{{ $page.props.errors.description }}</div>
-
-                                        </div>
-
-                                        <div class="mb-4">
-
-                                            <label for="exampleFormControlInput1" class="block text-gray-700 text-sm font-bold mb-2">price:</label>
-
-                                            <input type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="exampleFormControlInput1" placeholder="Enter price" v-model="form.price">
-
-                                            <div v-if="$page.props.errors.price" class="text-red-500">{{ $page.props.errors.price }}</div>
-
-                                        </div>
-
-                                        <div class="mb-4">
-
-                                            <label for="exampleFormControlInput1" class="block text-gray-700 text-sm font-bold mb-2">photo:</label>
-
-                                            <input type="file" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="exampleFormControlInput1" placeholder="Enter Image" @change="onImageChange">
-
-                                            <div v-if="$page.props.errors.photo" class="text-red-500">{{ $page.props.errors.photo }}</div>
-
-                                        </div>
-                                        
-                                        <!-- Vue component -->
-                                        <template>
-                                            <div class="mb-4">
-                                                <label class="block text-gray-700 text-sm font-bold mb-2">Category:</label>
-                                                <multiselect v-model="form.categories" tag-placeholder="Add this as new tag" placeholder="Search or add a tag" label="title" track-by="id" :options="categories" :multiple="true" :taggable="true" @tag="addTag"></multiselect>
-                                            </div>
-                                        </template>                                        
+                                        </div>                               
 
                                     </div>
 
@@ -291,20 +227,16 @@
 <script>
 import AppLayout from '@/Layouts/AppLayout'
 
-import Multiselect from 'vue-multiselect'
-
 import _ from "lodash"
 
 export default {
 
     components: {
         AppLayout,
-        Multiselect
     },
     
     props: {
-        plants: Object,
-        categories: Array,
+        categories: Object,
         errors: Object,
         trashedMode: Boolean,
     },
@@ -320,15 +252,7 @@ export default {
 
             form: {
 
-                name: null,
-
-                description: null,
-
-                price: null,
-
-                photo: null,
-
-                categories: [],
+                title: null,
 
             },
 
@@ -358,22 +282,14 @@ export default {
 
             this.form = {
 
-                name: null,
-
-                description: null,
-
-                price: null,
-
-                photo: null,
-
-                categories: null,
+                title: null,
 
             }
         },
 
         save: function (data) {
 
-            this.$inertia.post('/plant', data)
+            this.$inertia.post('/category', data)
 
             this.reset();
 
@@ -396,19 +312,11 @@ export default {
         },
 
         update: function (data) {
-            
+
             let forms = new FormData()
             forms.append('_method', 'put')
-            forms.append('name', data.name)
-            forms.append('description', data.description)
-            forms.append('price', data.price)
-            forms.append('photo', data.photo)
-            
-            const json = JSON.stringify({
-                categories: this.form.categories,
-            });
-            forms.append('data', json);
-            this.$inertia.post('/plant/'+data.id, forms)
+            forms.append('title', data.title)
+            this.$inertia.post('/category/' + data.id, forms)
 
             this.errors
 
@@ -433,7 +341,7 @@ export default {
                 }).then((result) => {
                 if (result.isConfirmed) {
                     data._method = 'DELETE';
-                    this.$inertia.post('/plant/' + data.id, data)
+                    this.$inertia.post('/category/' + data.id, data)
                     this.reset();
                     this.closeModal();
                     Swal.fire(
@@ -447,14 +355,14 @@ export default {
 
         search: _.throttle(function () {
             if (!this.trashedMode) {
-                this.$inertia.get('/plant', {
+                this.$inertia.get('/category', {
                     term: this.term
                 }, {
                     replace: true,
                     preserveScroll: true
                 })
             } else {
-                this.$inertia.get('/plant/trashed', {
+                this.$inertia.get('/category/trashed', {
                     term: this.term
                 }, {
                     replace: true,
@@ -482,7 +390,7 @@ export default {
                 }).then((result) => {
                 if (result.isConfirmed) {
                     data._method = 'PUT';
-                    this.$inertia.post('/plant/trashed/' + data.id, data)
+                    this.$inertia.post('/category/trashed/' + data.id, data)
                     Swal.fire(
                     'Restored!',
                     'Your file has been restored.',
@@ -507,7 +415,7 @@ export default {
                 }).then((result) => {
                 if (result.isConfirmed) {
                     data._method = 'DELETE';
-                    this.$inertia.post('/plant/trashed/' + data.id, data)
+                    this.$inertia.post('/category/trashed/' + data.id, data)
                     Swal.fire(
                     'Deleted!',
                     'Your file has been permanently deleted.',
@@ -530,7 +438,7 @@ export default {
                 confirmButtonText: 'Yes,restore it!'
                 }).then((result) => {
                 if (result.isConfirmed) {
-                    this.$inertia.get('/plant/trashed/restore-all')
+                    this.$inertia.get('/category/trashed/restore-all')
                     Swal.fire(
                     'All data restored!',
                     'All your file has been restored.',
@@ -553,7 +461,7 @@ export default {
                 confirmButtonText: 'Yes,permanent delete it!'
                 }).then((result) => {
                 if (result.isConfirmed) {
-                    this.$inertia.delete('/plant/trashed/delete-all')
+                    this.$inertia.delete('/category/trashed/delete-all')
                     Swal.fire(
                     'All data deleted!',
                     'All your file has been permanently deleted.',
@@ -561,20 +469,9 @@ export default {
                     )
                 }
             })
-        },
-        addTag (newTag) {
-            // const tag = {
-            //     title: newTag,
-            //     // id: newTag.substring(0, 2) + Math.floor((Math.random() * 10000000))
-            // }
-            const tag = newTag
-            this.categories.push(tag)
-            this.form.categories.push(tag.title)
         }
 
     }
 
 }
 </script>
-
-<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>

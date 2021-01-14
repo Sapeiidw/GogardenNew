@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PlantController;
 use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
@@ -30,6 +31,7 @@ Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->name('dashboard');
 Route::resource('user', UserController::class);
+Route::resource('category', CategoryController::class);
 Route::group(['middleware' => ['auth:sanctum', 'verified'], 'prefix' => '/plant'], function () {
     Route::get('/', [PlantController::class, 'index'])->name('plant.index');
     Route::post('/', [PlantController::class, 'store'])->name('plant.store');
